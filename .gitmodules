@@ -46,3 +46,4 @@
 [submodule "mongo-cxx-driver"]
 	path = mongo-cxx-driver
 	url = git@github.com:mongodb/mongo-cxx-driver.git
+	branch = releases/legacy

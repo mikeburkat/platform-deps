@@ -17,9 +17,9 @@ JOBS?=8
 #determine if node js is used, if using ubuntu 14 it should be disabled
 NODEJS_ENABLED := 0
 
-all: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache
+all: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache install_curlpp
 
-.PHONY: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache
+.PHONY: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache install_curlpp
 
 install_node:
 	if [ $(NODEJS_ENABLED) = 1 ]; \
@@ -133,6 +133,26 @@ install_cairomm:
 	./autogen.sh; \
 	CXX=$(CXX) CC=$(CC) ./configure --prefix=$(TARGET); \
 	make install
+
+install_curlpp:
+	cd curlpp; \
+	if [ -s CMakeCache.txt ]; then rm CMakeCache.txt; fi; \
+	if [ -d CMakeFiles ]; then rm -rf CMakeFiles; fi; \
+	if [ -s install_manifest.txt ]; then rm install_manifest.txt; fi; \
+	if [ -s Makefile ]; then rm Makefile; fi; \
+	if [ -s CTestTestfile.cmake ]; then rm -rf CTestTestfile.cmake; fi; \
+	if [ -s cmake_install.cmake ]; then rm cmake_install.cmake; fi; \
+	cmake -DCMAKE_INSTALL_PREFIX=$(TARGET) -DCMAKE_CXX_COMPILER=$(GXX) -DCMAKE_C_COMPILER=$(GCC); \
+	make -j$(JOBS) -k install;
+
+install_aerospike-client-c:
+	cd aerospike-client-c;\
+	make;\
+	make -j$(JOBS) -k install;
+
+install_mongo-cxx-driver:
+	cd mongo-cxx-driver;\
+	scons --prefix=$(TARGET) --cpppath=$(TARGET)/include --libpath=$(TARGET)/lib --sharedclient  install;
 
 # Helps troubleshooting deployments via scripts.
 .PHONY: test-deploy
