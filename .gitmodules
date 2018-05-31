@@ -37,3 +37,12 @@
 [submodule "redis"]
 	path = redis
 	url = git@github.com:antirez/redis.git
+[submodule "curlpp"]
+	path = curlpp
+	url = https://github.com/jpbarrette/curlpp.git
+[submodule "aerospike-client-c"]
+	path = aerospike-client-c
+	url = https://github.com/aerospike/aerospike-client-c.git
+[submodule "mongo-cxx-driver"]
+	path = mongo-cxx-driver
+	url = git@github.com:mongodb/mongo-cxx-driver.git
