@@ -1,6 +1,6 @@
 
 # Determine where the install directory is located.
-TARGET?=$(HOME)/local
+TARGET?=$(INSTALLDIR)/local
 GCC ?= gcc
 GXX ?= g++
 GCC_MAJOR_VERSION := $(shell $(GCC) -dumpversion | cut -d'.' -f1)
