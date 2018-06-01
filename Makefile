@@ -148,7 +148,7 @@ install_curlpp:
 install_aerospike-client-c:
 	cd aerospike-client-c;\
 	make;\
-	make -j$(JOBS) -k install;
+	sudo make -j$(JOBS) -k install;
 
 install_mongo-cxx-driver:
 	cd mongo-cxx-driver;\
