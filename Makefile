@@ -1,6 +1,6 @@
 
 # Determine where the install directory is located.
-TARGET?=$(HOME)/local
+TARGET?=$(INSTALLDIR)/local
 GCC ?= gcc
 GXX ?= g++
 GCC_MAJOR_VERSION := $(shell $(GCC) -dumpversion | cut -d'.' -f1)
@@ -17,9 +17,10 @@ JOBS?=8
 #determine if node js is used, if using ubuntu 14 it should be disabled
 NODEJS_ENABLED := 0
 
-all: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache
+all: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache install_curlpp install_aerospike-client-c install_mongo
 
-.PHONY: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache
+
+.PHONY: install_node install_boost install_userspacercu install_hiredis install_snappy install_cityhash install_zeromq install_libssh2 install_protobuf install_zookeeper install_redis install_pistache install_curlpp install_aerospike-client-c install_mongo
 
 install_node:
 	if [ $(NODEJS_ENABLED) = 1 ]; \
@@ -133,6 +134,44 @@ install_cairomm:
 	./autogen.sh; \
 	CXX=$(CXX) CC=$(CC) ./configure --prefix=$(TARGET); \
 	make install
+
+install_curlpp:
+	cd curlpp; \
+	if [ -s CMakeCache.txt ]; then rm CMakeCache.txt; fi; \
+	if [ -d CMakeFiles ]; then rm -rf CMakeFiles; fi; \
+	if [ -s install_manifest.txt ]; then rm install_manifest.txt; fi; \
+	if [ -s Makefile ]; then rm Makefile; fi; \
+	if [ -s CTestTestfile.cmake ]; then rm -rf CTestTestfile.cmake; fi; \
+	if [ -s cmake_install.cmake ]; then rm cmake_install.cmake; fi; \
+	cmake -DCMAKE_INSTALL_PREFIX=$(TARGET) -DCMAKE_CXX_COMPILER=$(GXX) -DCMAKE_C_COMPILER=$(GCC); \
+	make -j$(JOBS) prefix=$(TARGET) -k install;
+
+install_aerospike-client-c:
+	cd aerospike-client-c;\
+	CXX=$(CXX) CC=$(CC) PREFIX=$(TARGET);\
+	make;\
+	echo "Installing header files.";\
+	rm -rf $(TARGET)/include/{aerospike,citrusleaf};\
+	echo cp -r target/Linux-x86_64/include/{aerospike,citrusleaf} $(TARGET)/include;\
+	cp -r target/Linux-x86_64/include/{aerospike,citrusleaf} $(TARGET)/include;\
+	\
+	echo "Installing libraries.";\
+	echo cp target/Linux-x86_64/lib/libaerospike.* $(TARGET)/lib;\
+	cp target/Linux-x86_64/lib/libaerospike.* $(TARGET)/lib;\
+	\
+	echo "Installing Lua files.";\
+	mkdir -p $(TARGET)/aerospike/client/sys/udf/lua;\
+	mkdir -p $(TARGET)/aerospike/client/usr/udf/lua;\
+	echo cp modules/lua-core/src/{aerospike.lua,as.lua,stream_ops.lua} $(TARGET)/aerospike/client/sys/udf/lua;\
+	cp modules/lua-core/src/{aerospike.lua,as.lua,stream_ops.lua} $(TARGET)/aerospike/client/sys/udf/lua;
+	# chmod g-w,o-w $(TARGET)/aerospike/client/sys/udf/lua/* $(TARGET)/aerospike/client/sys/udf/lua/*;
+
+# chmod -R g-w,o-w $(TARGET)/include/{aerospike,citrusleaf};
+# chmod g-w,o-w $(TARGET)/lib/libaerospike.*;
+install_mongo-cxx-driver:
+	cd mongo-cxx-driver;\
+	CXX=$(CXX) CC=$(CC) PREFIX=$(TARGET);\
+	scons --prefix=$(TARGET) --cpppath=$(TARGET)/include --libpath=$(TARGET)/lib --sharedclient  install;
 
 # Helps troubleshooting deployments via scripts.
 .PHONY: test-deploy
